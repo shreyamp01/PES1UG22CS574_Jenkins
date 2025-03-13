@@ -1,62 +1,37 @@
 pipeline {
     agent any
-
     stages {
-        stage('Clone Repository') {
+        stage('Clone repository') {
             steps {
-                script {
-                    try {
-                        checkout([$class: 'GitSCM',
-                            branches: [[name: '*/main']],
-                            userRemoteConfigs: [[url: 'https://github.com/shreyamp01/PES1UG22CS574_Jenkins.git']]
-                        ])
-                    } catch (err) {
-                        error "Git checkout failed: ${err}"
-                    }
-                }
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/shreyamp01/PES1UG22CS574_Jenkins.git']]])
             }
         }
-
+        
         stage('Build') {
             steps {
-                script {
-                    try {
-                        sh 'g++ ./main/hello.cpp -o output'
-                        echo 'Build successful'
-                    } catch (err) {
-                        error "Build failed: ${err}"
-                    }
-                }
+                build 'PES1UG22CS574-1'
+                sh 'g++ ./main/hello.cpp -o output'
             }
         }
 
         stage('Test') {
             steps {
-                script {
-                    try {
-                        sh './output'
-                        echo 'Tests executed successfully'
-                    } catch (err) {
-                        error "Test execution failed: ${err}"
-                    }
-                }
+                sh './output'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
-                // Add deployment commands here if necessary
+                echo 'deploy'
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
         failure {
-            echo 'Pipeline failed. Check logs for errors.'
+            error 'Pipeline failed'
         }
     }
 }
